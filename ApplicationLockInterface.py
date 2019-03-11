@@ -18,6 +18,7 @@ def search():
   print("The requested app to block is " + windowToBlock.get())
   print("The requested time to block  is " + timeDuration.get() + " minutes")
   print("Optional: create a Pin # for lock recent " + pinNumber.get() + " minutes")
+  print("The requested block level is " + blockLevel.get())
   return ''
 
 # APP TO BE BLOCKED
@@ -35,10 +36,12 @@ ttk.Label(mainframe, text="Enter a Pin").grid(column=2, row=5)
 
 ttk.Entry(mainframe, width=7, textvariable=pinNumber).grid(column=2, row=6)
 
+# BLOCK LEVEL 1-2
 ttk.Label(mainframe, text="Enter Block Level 1 = Minor Block, 2 = Tedious").grid(column=2, row=7)
 
 ttk.Entry(mainframe, width=7, textvariable=blockLevel).grid(column=2, row=8)
 
+#BUTTON
 ttk.Button(mainframe, text="Engage Lock", command=search).grid(column=2, row=13)
 
 
