@@ -2,6 +2,9 @@
 import os
 import winreg
 
+# pretty sure we don't need the add/remove functions since updates to the
+# registry should be done in batches anyway
+
 # initialize variables
 POLICIES_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies"
 EXPLORER_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
@@ -14,7 +17,6 @@ HKEY = winreg.HKEY_CURRENT_USER
 # postcondition: the necessary registers are created
 # exceptions: 
 def initializeRegistry():
-
     # initialize function/variables
     explorerKey = None
 
@@ -31,56 +33,61 @@ def initializeRegistry():
         if( explorerKey != None ):
             winreg.CloseKey( explorerKey )
         print("Unable to run as an administrator - Could not create registries")
-        print(error)             
-
-# algorithm: application the given app to the DisallowRun registry
-# precondition: passed application name as a string and its associated ID number as a string
-# postcondition: a value name/value pair is added to the DisallowRun registry
-# of the form ID/application name
-# exceptions:
-def addAppToRegistry( appName, regNum ):
-
-    # initialize function/variables
-    disallowKey = None
-
-    try:
-        # write application name to the registry
-        disallowKey = winreg.OpenKey( HKEY, DISALLOWRUN_DIR, 0, winreg.KEY_WRITE )
-        winreg.SetValueEx( disallowKey, regNum, 0, winreg.REG_SZ, appName ) 
-        winreg.CloseKey( disallowKey )
-
-        # restart explorer so the changes take effect
-        restartExplorer()
-    
-    except WindowsError as error:
-        if( disallowKey != None ):
-            winreg.CloseKey( disallowKey )
-        print("Unable to run as an administrator - Could not create registries")
-        print(error)    
-
-# algorithm: removes an application from the DisallowRun registry
-# precondition: passed the ID number of the target app as a string
-# postcondition: value name/value pair with the passed ID is no longer in the
-# DisalloRun registry
-# exceptions:
-def removeAppFromRegistry( regNum ):
-    # initialize function/variables
-    disallowKey = None
-
-    try:
-        # write application name to the registry
-        disallowKey = winreg.OpenKey( HKEY, DISALLOWRUN_DIR, 0, winreg.KEY_WRITE )
-        winreg.DeleteValue( disallowKey, appName ) 
-        winreg.CloseKey( disallowKey )
-
-        # restart explorer so the changes take effect
-        restartExplorer()
-    
-    except WindowsError as error:
-        if( disallowKey != None ):
-            winreg.CloseKey( disallowKey )
-        print("Unable to run as an administrator - Could not create registries")
         print(error)
+
+# algorithm: iterates through the app dictionary and adds any blocked apps to
+# the DisallowRun registry, then clears all other values in the registry
+# precondition: passed a dictionary of applications as key and whether they are
+# blocked as values
+# postcondition: any blocked apps are represented in the DisallowRun registry
+# and there are no artifacts in that registry of previous changes
+# exceptions: 
+def updateRegistry( appDict ):
+    # initialize funciton/variables
+    disallowKey = None
+    index = 1
+
+    try:
+        # open the disallowrun registry
+        disallowKey = winreg.OpenKey( HKEY, DISALLOWRUN_DIR, 0, winreg.KEY_WRITE )
+
+        # loop through appDict
+        for app in appDict:
+
+            # if app is blocked, add it
+            if( appDict[ app ] == 1 ):
+
+                winreg.SetValueEx( disallowKey, str( index ), 0, winreg.REG_SZ, app )
+                index += 1
+                
+        # end loop
+
+        # clean up any remaining value_name value pairs in the registry
+
+        while( True ):
+            winreg.DeleteValue( disallowKey, str( index ) )
+            index += 1
+                
+    # except value_name not found
+    except WindowsError as error:
+
+        # this is the error to be expected if DeleteValue tried to delete
+        # something that wasn't there, meaning we are at the end of the
+        # registry and can exit
+        if( error.winerror == 2 ):
+            print( error )
+            winreg.CloseKey( disallowKey )
+            
+            # restart explorer so the changes take effect
+            restartExplorer()
+
+            pass
+
+        else:
+            if( explorerKey != None ):
+                winreg.CloseKey( explorerKey )
+            print("Unable to run as an administrator - Could not create registries")
+            print(error)
 
 # algorithm: sets the DisallowRun value in the Explorer key to:
 # "1" - disables applications in the DisallowRun key
