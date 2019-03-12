@@ -1,13 +1,21 @@
-import requests #used to test if a website exsists
+import urllib
+from urllib.error import URLError
+from urllib.error import HTTPError
+from urllib.request import urlopen#used to test if a website exsists
 
 def addWebsite( url, websiteList ):
-    connection = requests.get( url )
 
-    if connection.status_code == 404: #404 is the code of not found
-        print("Website Doesn't Exsist") #temporary print out
-        
+    try:
+        connection = urlopen( url )
+    except HTTPError:
+        print("Not Valid URL") #temporary print outs!
+    except URLError:
+        print("Not Valid URL")
+    except ValueError:
+        print("Not Valid URL")
     else:
-         websiteList.append( url )
+        websiteList.append( url )
+    
 
 def addApplication( filePath, applicationList ):
     try:
@@ -18,6 +26,4 @@ def addApplication( filePath, applicationList ):
         
     else:
         applicationList.append( filePath )
-        
-    
-#tested and works. Testing if the file or website exsists and then adding them to the lists.
+
