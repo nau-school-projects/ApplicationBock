@@ -1,9 +1,8 @@
-import urllib
 from urllib.error import URLError
 from urllib.error import HTTPError
-from urllib.request import urlopen          #used to test if a website exists
+from urllib.request import urlopen #used to test if a website exsists
 
-from os.path import exists                  # used to test if a file exists
+from os.path import exists
 
 def addWebsite( url, websiteList ):
 
@@ -16,7 +15,7 @@ def addWebsite( url, websiteList ):
     except ValueError:
         print("Not Valid URL3")
     else:
-        websiteList.append( url )
+        websiteList.append( url.split('/')[2] )
     
 
 def addApplication( filePath, applicationList ):
