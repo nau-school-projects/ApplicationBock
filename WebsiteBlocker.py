@@ -1,34 +1,32 @@
-import socket #needed to find the local hose IP
-import shutil #used to copy the duplicate the host_file needed for windows 
-import os     #needed to delete the duplicate host_file
+localHost = "127.0.0.1"  #defualt local host
+hostFile = r"C:\Windows\System32\Drivers\etc\hosts" #default file path for windows host file
 
-
-redirct = socket.gethostbyname(socket.gethostname())
-hostFile = r"C:\Windows\System32\Drivers\etc\hosts"
-
-dupHostFile = r"C:\Windows\System32\Drivers\etc\hostsD"
-
-def duplicateHostFile():
-    shutil.copy(hostFile, dupHostFile )
     
 def blockWebsite( blockedList ):
-    duplicateHostFile()
-    
-    with open( dupHostFile, 'r+'):
-        hostFileContent = file.read()
-    
-    for website in blockList:
-        if website in hostFileContent:
-            pass
-        else:
-            file.write( redirect + " " + website + "\n" )
+    with open( hostFile, 'r+') as hostFileOpen:
+        hostFileContent = hostFileOpen.read()
 
-def unblockWebsite( blockedList ):
-    if os.path.exists( dupHostFile ):
-        os.remove( dupHostFile )
-    else:
-        pass
+        for website in blockedList:
+            if website in hostFileContent:
+                pass
+            else:
+                hostFileOpen.write( localHost + " " + website + "\n" )
 
-                
+def unblockWebsite( blockedList):
+    with open( hostFile, 'r+') as hostFileOpen:
+       
+        hostFileContent = hostFileOpen.readlines()
+        
+        hostFileOpen.seek()
+
+        for line in hostFileContent:
+            for website in blockedList:
+                if not any website in line:
+                    hostFileOpen.write(line)
+                    
+        hostFileOpen.truncate()
+        
+# must be ran as administrator
+
+
     
-# Havent tested this fully yet.
