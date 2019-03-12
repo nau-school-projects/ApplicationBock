@@ -16,8 +16,6 @@ def blockWebsite( blockedDict ):
                 
                 blockedDict[key] = blocked
 
-    return blockedDict
-
 def unblockWebsite( blockedDict):
     blocked = False
     with open( HOSTFILE, 'r+') as hostFileOpen:
@@ -34,6 +32,5 @@ def unblockWebsite( blockedDict):
                     blockedDict[key] = False
                     
         hostFileOpen.truncate()
-        
-        return blockedDict
+
 # must be ran as administrator 
