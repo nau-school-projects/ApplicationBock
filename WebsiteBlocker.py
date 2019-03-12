@@ -6,15 +6,15 @@ import os     #needed to delete the duplicate host_file
 redirct = socket.gethostbyname(socket.gethostname())
 hostFile = r"C:\Windows\System32\Drivers\etc\hosts"
 
-duplicateHostFile = r"C:\Windows\System32\Drivers\etc\hostsD"
+dupHostFile = r"C:\Windows\System32\Drivers\etc\hostsD"
 
-def duplicateHostFile ():
-    shutil.copy(hostFile, duplicateHostFile )
+def duplicateHostFile():
+    shutil.copy(hostFile, dupHostFile )
     
 def blockWebsite( blockedList ):
     duplicateHostFile()
     
-    with open( duplicateHostFile, 'r+'):
+    with open( dupHostFile, 'r+'):
         hostFileContent = file.read()
     
     for website in blockList:
@@ -24,10 +24,11 @@ def blockWebsite( blockedList ):
             file.write( redirect + " " + website + "\n" )
 
 def unblockWebsite( blockedList ):
-    if os.path.exists( duplicateHostFile ):
-        os.remove( duplicateHostFile )
+    if os.path.exists( dupHostFile ):
+        os.remove( dupHostFile )
     else:
         pass
+
                 
     
-# Havent tested this fully yet, can not test on school computer which i am using to code! will test later today
+# Havent tested this fully yet.
