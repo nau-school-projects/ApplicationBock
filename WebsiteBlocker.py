@@ -16,13 +16,12 @@ def unblockWebsite( blockedList):
     with open( hostFile, 'r+') as hostFileOpen:
        
         hostFileContent = hostFileOpen.readlines()
-        
-        hostFileOpen.seek()
+
+        hostFileOpen.seek(0)
 
         for line in hostFileContent:
-            for website in blockedList:
-                if not any website in line:
-                    hostFileOpen.write(line)
+            if not any (website in line for website in blockedList):
+                hostFileOpen.write(line)
                     
         hostFileOpen.truncate()
         
