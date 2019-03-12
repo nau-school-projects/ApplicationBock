@@ -4,7 +4,10 @@ from urllib.request import urlopen #used to test if a website exsists
 
 from os.path import exists
 
-def addWebsite( url, websiteList ):
+BLOCKED = False
+EXECUTABLE = "exe"
+
+def addWebsite( url, websiteDict ):
 
     try:
         connection = urlopen( url )
@@ -15,15 +18,14 @@ def addWebsite( url, websiteList ):
     except ValueError:
         print("Not Valid URL3")
     else:
-        websiteList.append( url.split('/')[2] )
+        websiteDict[url.split('/')[2]] = BLOCKED
     
 
-def addApplication( filePath, applicationList ):
+def addApplication( filePath, applicationDict ):
     if exists( filePath ):
-        applicationList.append( filePath )
+        if filePath[-3:] == EXECUTABLE:
+            applicationDict[filePath] = BLOCKED
+        else:
+            print("File not an executable")
     else:
         print("file not found")
-
-
-
-
