@@ -20,8 +20,9 @@ def unblockWebsite( blockedList):
         hostFileOpen.seek(0)
 
         for line in hostFileContent:
-            if not any (website in line for website in blockedList):
-                hostFileOpen.write(line)
+            for website in blockedList:
+                if not website in line:
+                    hostFileOpen.write(line)
                     
         hostFileOpen.truncate()
         
