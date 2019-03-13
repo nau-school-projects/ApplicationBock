@@ -24,7 +24,7 @@ def addWebsite( url, websiteDict ):
 def addApplication( filePath, applicationDict ):
     if exists( filePath ):
         if filePath[-3:] == EXECUTABLE:
-            applicationDict[filePath] = BLOCKED
+            applicationDict[filePath.split('\\')[-1]] = BLOCKED
         else:
             print("File not an executable")
     else:
