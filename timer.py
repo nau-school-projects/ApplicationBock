@@ -1,7 +1,9 @@
+# used for run_timer
 import threading
+# used for run_sleep_timer
 import time
 
-# initialize unit variables
+# initialize time unit variables
 SECOND = 'SEC'
 MINUTE = 'MIN'
 HOUR = 'HOUR'
@@ -9,7 +11,8 @@ HOUR = 'HOUR'
 # Function: run_timer
 # Desc: Utilizes a threaded Timer Object
 #       Will run passed in function after the timer runs
-# Param: valid unit values: SECOND, MINUTE, HOUR
+#       for passed in duration.
+# Param: valid time unit values: SECOND, MINUTE, HOUR
 def run_timer( duration, unit, function ):
 	
 	# calculate duration in seconds
@@ -33,7 +36,7 @@ def run_timer( duration, unit, function ):
 
 # Function: run_sleep_timer
 # Desc: Utilizes time.sleep to run a timer
-# Param: valid unit values: SECOND, MINUTE, HOUR
+# Param: valid time unit values: SECOND, MINUTE, HOUR
 def run_sleep_timer( duration, unit ):
 	# calculate duration in seconds
 	if( unit == SECOND ):
@@ -43,7 +46,7 @@ def run_sleep_timer( duration, unit ):
 	elif( unit == HOUR ):
 		seconds = duration * 3600
 	else:
-		print("Invalid Unit: Defaulting to SECONDS")
+		print("Invalid Time Unit: Defaulting to SECONDS")
 		seconds = duration
 
 	# run timer for passed in duration
