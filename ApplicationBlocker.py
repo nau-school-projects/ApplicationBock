@@ -11,6 +11,8 @@ EXPLORER_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
 DISALLOWRUN_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\DisallowRun"
 HKEY = winreg.HKEY_CURRENT_USER
 
+BLOCKED = 1 # from BlockedList
+
 # algorithm: uses inreg to create the necessary registers for blocking apps on
 # windows systems
 # precondition: called when the necessary registers to not yet exist
@@ -55,7 +57,7 @@ def updateRegistry( appDict ):
         for app in appDict:
 
             # if app is blocked, add it
-            if( appDict[ app ] == 1 ):
+            if( appDict[ app ] == BLOCKED ):
 
                 winreg.SetValueEx( disallowKey, str( index ), 0, winreg.REG_SZ, app )
                 index += 1
