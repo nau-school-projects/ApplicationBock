@@ -1,53 +1,34 @@
-# used for run_timer
-import threading
-# used for run_sleep_timer
 import time
-
-# initialize time unit variables
-SECOND = 'SEC'
-MINUTE = 'MIN'
-HOUR = 'HOUR'
-
-# Function: run_timer
-# Desc: Utilizes a threaded Timer Object
-#       Will run passed in function after the timer runs
-#       for passed in duration.
-# Param: valid time unit values: SECOND, MINUTE, HOUR
-def run_timer( duration, unit, function ):
-	
-	# calculate duration in seconds
-	if( unit == SECOND ):
-		seconds = duration
-	elif( unit == MINUTE ):
-		seconds = duration * 60
-	elif( unit == HOUR ):
-		seconds = duration * 3600
-	else:
-		print("Invalid Unit: Defaulting to SECONDS")
-		seconds = duration
-
-	# initialize timer object
-	timer = threading.Timer( seconds, function)
-
-	# start timer for passed in duration (seconds)
-	timer.start()
-	# waiting for time completion
-	timer.join()
 
 # Function: run_sleep_timer
 # Desc: Utilizes time.sleep to run a timer
-# Param: valid time unit values: SECOND, MINUTE, HOUR
-def run_sleep_timer( duration, unit ):
-	# calculate duration in seconds
-	if( unit == SECOND ):
-		seconds = duration
-	elif( unit == MINUTE ):
-		seconds = duration * 60
-	elif( unit == HOUR ):
-		seconds = duration * 3600
-	else:
-		print("Invalid Time Unit: Defaulting to SECONDS")
-		seconds = duration
+def runTimer( hours, minutes ):
 
-	# run timer for passed in duration
-	time.sleep( seconds )
+	# initalizing variables
+	hours = hours
+	minutes = minutes;
+	seconds = 0
+
+	# calculate total duration in seconds
+	duration = int(( hours * 3600 ) + ( minutes * 60 ))
+
+	# iterate through duration ( 0 to duration )
+	for i in range(duration):
+		if seconds == 0:
+			if minutes != 0:
+				minutes = minutes - 1
+				seconds = 60
+		if minutes == 0:
+			if hours != 0:
+				hours = hours - 1
+				minutes = 59
+				seconds = 60
+
+		# decremenet seconds
+		seconds = seconds - 1
+
+		# wait for 1 second
+		time.sleep(1)
+
+		# output current timer countdown
+		print( hours, ":", minutes, ":", seconds )
