@@ -1,6 +1,6 @@
 import math
 
-class MD5_Encryptor():
+class MD5Encryptor():
     
     def __init__(self, password):
         self.rotates = [ 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
