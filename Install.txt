@@ -1,2 +1,0 @@
-Necessary pip installations:
-pip install pywin32
