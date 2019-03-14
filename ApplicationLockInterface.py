@@ -28,6 +28,8 @@ timeDuration = IntVar() # NOTE: Need way to differentiate units user enters
 # might not even need seconds, except for teting purposes
 pinNumber = StringVar()
 blockLevel = StringVar()
+numMinutes=StringVar()
+numHours=StringVar()
 fullList = None
 
 # FUNCTIONS
@@ -36,6 +38,8 @@ def search():
   print("The requested time to block  is " + timeDuration.get() + " minutes")
   print("Optional: create a Pin # for lock recent " + pinNumber.get() + " minutes")
   print("The requested block level is " + blockLevel.get())
+  print("Number of hours to block the application " + numHours.get() + " hours")
+  print("Number of minutes to block the application" + numMinutes.get() + "hours")
   return ''
 
 def addApp():
@@ -89,10 +93,14 @@ ttk.Button(mainframe, text="Add", command=addWebsite).grid(column=3, row=4)
 fullList = ttk.Label(mainframe, text="",)
 fullList.grid(column=4, row=1)
 
-# TIME TO BE BLOCKED FOR
-ttk.Label(mainframe, text="How Long Would You Like To Block The Application").grid(column=2, row=5)
+## TIME TO BE BLOCKED FOR
+ttk.Label(mainframe, text="How Long Would You Like To Block The Application").grid(column=2, row=3)
 
-ttk.Entry(mainframe, width=7, textvariable=timeDuration).grid(column=2, row=6)
+ttk.Label(mainframe, text="Enter Hours").grid(column=2, row=4)
+ttk.Entry(mainframe, width=3, textvariable=numHours).grid(column=2, row=5)
+
+ttk.Label(mainframe, text="Enter Minutes").grid(column=2, row=6)
+ttk.Entry(mainframe, width=3, textvariable=numMinutes).grid(column=2, row=7)
 
 # APP PIN TO GET DISIRED APPS TO BLOCK
 #ttk.Label(mainframe, text="Enter a Pin").grid(column=2, row=5)
@@ -109,14 +117,3 @@ ttk.Button(mainframe, text="Engage Lock", command=activateTimedBlock).grid(colum
 
 
 root.mainloop()
-
-
-
-
-
-
-
-
-
-
-
