@@ -1,8 +1,12 @@
 from tkinter import *
 from tkinter import ttk
 from BlockedList import *
-from timer import *
+#from timer import *
 from Scanner import *
+from timer import *
+
+import time
+import threading
 
 # INITIALIZATION
 
@@ -23,14 +27,63 @@ mainframe.pack(fill=None, expand=False)
 # initialize variables
 appToBlock = StringVar()
 websiteToBlock = StringVar()
-timeDuration = IntVar() # NOTE: Need way to differentiate units user enters
-# ideally, user doens't have to type anything and can select number of hours / minutes / seconds
-# might not even need seconds, except for teting purposes
 pinNumber = StringVar()
 blockLevel = StringVar()
-numMinutes=StringVar()
-numHours=StringVar()
+# NOTE: Need way to differentiate units user enters
+# ideally, user doens't have to type anything and can select number of hours / minutes / seconds
+# might not even need seconds, except for teting purposes
+numMinutes=IntVar()
+numHours=IntVar()
+timerLabel = None
 fullList = None
+
+
+# THREAD
+
+class timerThread( threading.Thread ):
+  def __init__( self, hours, minutes, timerLabel ):
+    threading.Thread.__init__(self)
+    self.hours = hours
+    self.minutes = minutes
+    self.timerLabel = timerLabel
+
+  def run(self):
+    # initalizing variables
+    hours = self.hours
+    minutes = self.minutes;
+    seconds = 0
+    timerLabel = self.timerLabel
+
+    # calculate total duration in seconds
+    duration = int(( hours * 3600 ) + ( minutes * 60 ))
+
+    # iterate through duration ( 0 to duration )
+    for i in range(duration):
+      if seconds == 0:
+        if minutes != 0:
+          minutes = minutes - 1
+          seconds = 60
+      if minutes == 0:
+        if hours != 0:
+          hours = hours - 1
+          minutes = 59
+          seconds = 60
+
+      # decremenet seconds
+      seconds = seconds - 1
+
+      # wait for 1 second
+      time.sleep(1)
+
+      # output current timer countdown
+      currentList = timerLabel[ "text" ]
+      currentList = ( hours, ":", minutes, ":", seconds )
+      timerLabel[ "text" ] = currentList
+
+    # time is up, unblock everything
+    timerLabel[ "text" ] = ""
+    disallowApps( False )
+    unblockWebsite( blockList.webDict )
 
 # FUNCTIONS
 def search():
@@ -57,21 +110,22 @@ def addWebsite():
   fullList[ "text" ] = currentList
 
 def activateTimedBlock():
+    # applications
+    disallowApps( True )
+    updateRegistry( blockList.appDict )
 
-  # applications
-  disallowApps( True )
-  updateRegistry( blockList.appDict )
+    # websites
+    blockWebsite( blockList.webDict )
 
-  # websites
-  blockWebsite( blockList.webDict )
-
-  # unblock
-  # for now, pasing it a bogus unit so that it will default to seconds
-  run_sleep_timer( timeDuration.get(), "Time Unit" )
-  disallowApps( False )
-  unblockWebsite( blockList.webDict )
-
+    # spool off thread to unblock after time is up
+    newThread = timerThread( numHours.get(), numMinutes.get(), timerLabel )
+    newThread.start()
+  
 # WINDOW
+
+# TIMER
+timerLabel = ttk.Label(mainframe, text="")
+timerLabel.grid(column=1, row=1)
 
 # ADD APP TO BE BLOCKED
 ttk.Label(mainframe, text="What Application Would You Like To Lock").grid(column=2, row=1)
@@ -90,17 +144,18 @@ ttk.Entry(mainframe, width=21, textvariable=websiteToBlock).grid(column=2, row=4
 ttk.Button(mainframe, text="Add", command=addWebsite).grid(column=3, row=4)
 
 # LIST OF APPS/WEBSITE
-fullList = ttk.Label(mainframe, text="",)
-fullList.grid(column=4, row=1)
+fullList = ttk.Label(mainframe, text="")
+#fullList = Text(mainframe, height=10, width=30, state=DISABLED)
+fullList.grid(column=4, row=1, rowspan = 10, sticky = N+S)
 
 ## TIME TO BE BLOCKED FOR
-ttk.Label(mainframe, text="How Long Would You Like To Block The Application").grid(column=2, row=3)
+ttk.Label(mainframe, text="How Long Would You Like To Block The Application").grid(column=2, row=5)
 
-ttk.Label(mainframe, text="Enter Hours").grid(column=2, row=4)
-ttk.Entry(mainframe, width=3, textvariable=numHours).grid(column=2, row=5)
+ttk.Label(mainframe, text="Enter Hours").grid(column=2, row=6)
+ttk.Entry(mainframe, width=5, textvariable=numHours).grid(column=2, row=7)
 
-ttk.Label(mainframe, text="Enter Minutes").grid(column=2, row=6)
-ttk.Entry(mainframe, width=3, textvariable=numMinutes).grid(column=2, row=7)
+ttk.Label(mainframe, text="Enter Minutes").grid(column=2, row=8)
+ttk.Entry(mainframe, width=5, textvariable=numMinutes).grid(column=2, row=9)
 
 # APP PIN TO GET DISIRED APPS TO BLOCK
 #ttk.Label(mainframe, text="Enter a Pin").grid(column=2, row=5)
@@ -117,3 +172,14 @@ ttk.Button(mainframe, text="Engage Lock", command=activateTimedBlock).grid(colum
 
 
 root.mainloop()
+
+
+
+
+
+
+
+
+
+
+
