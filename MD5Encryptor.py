@@ -8,7 +8,7 @@ class MD5Encryptor():
                   4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
                   6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21 ]
         self.constants = []
-        set_constants()
+        setConstants()
         self.password = password
         self.a0 = 0x67452301
         self.b0 = 0xefcdab89
@@ -20,12 +20,12 @@ class MD5Encryptor():
         self.func_D = lambda b, c, d: c ^ (b | ~d)
         
 
-    def set_constants(self):
+    def setConstants(self):
         for(i in range(64)):
             self.constants[i] = math.floor(2**32 * (int(abs(math.sin(i+1)))))
 
 
-    def md5_hash(self):
+    def md5Hash(self):
         pass_bytes = bytearray(self.password, 'utf-8')
         pass_length = (8 * len(self.password)) % (2**64)
         pass_bytes.append(0b01)
@@ -60,7 +60,7 @@ class MD5Encryptor():
             A = D
             D = C
             C = B
-            B = B + rotate_left(rotator, self.rotates[i])
+            B = B + rotateLeft(rotator, self.rotates[i])
         a0 += A
         b0 += B
         c0 += C
@@ -71,12 +71,12 @@ class MD5Encryptor():
             md5Hash += (digest[i] << (32 * i))
         return md5Hash
 
-    def hash_to_hex(self, message):
+    def hashToHex(self, message):
         raw = message.to_bytes(16, byteorder="little")
         return '{:032x}'.format(int.from_bytes(raw, byteorder="big"))
 
 
-    def rotate_left(self, value, ammount):
+    def rotateLeft(self, value, ammount):
         return ((value << ammount) | (x >> (32 - ammount)))
     
         
