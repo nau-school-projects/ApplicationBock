@@ -1,20 +1,20 @@
-import MD5_Encryptor
+import MD5Encryptor
 
 # I need to wait until I can see the User files to handle interactions
 # with the rest of the program
-class Pass_Handler():
+class PassHandler():
 
     def __init__(self, password):
         self.password = password
-        self.encryptor = MD5_Encryptor(self.password)
+        self.encryptor = MD5Encryptor(self.password)
         self.hash = None
 
-    def save_to_file(self):
+    def saveToFile(self):
         pass
 
-    def encrypt_pass(self):
-        md5 = self.encryptor.md5_hash()
-        hex_hash = self.encryptor.hash_to_hex(md5)
+    def encryptPass(self):
+        md5 = self.encryptor.md5Hash()
+        hex_hash = self.encryptor.hashToHex(md5)
         self.hash = hex_hash
         print(self.hash)
         
