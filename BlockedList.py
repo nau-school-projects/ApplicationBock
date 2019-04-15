@@ -1,22 +1,25 @@
+# import necessary modules
 import os
 import winreg
+from WebsiteBlocker import *
+
+# initialize constants
+UNBLOCKED = False
+BLOCKED = True
+
+POLICIES_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies"
+EXPLORER_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+DISALLOWRUN_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\DisallowRun"
+HKEY = winreg.HKEY_CURRENT_USER
+
+LOCALHOST = "127.0.0.1"  #defualt local host
+HOSTFILE = r"C:\Windows\System32\Drivers\etc\hosts" #default file path for windows host file
 
 # Simple storage class that holds the a records of all apps/websties entered
 # into the app, and whether or not those are blocked. In the future, each
 # isntance of the User class will have a unique set of blocked applications,
 # hence why this is a class.
 class BlockedList( object ):
-    # initialize constants
-    UNBLOCKED = False
-    BLOCKED = True
-    
-    # initialize variables
-    POLICIES_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies"
-    EXPLORER_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
-    DISALLOWRUN_DIR = r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\DisallowRun"
-    HKEY = winreg.HKEY_CURRENT_USER
-    LOCALHOST = "127.0.0.1"  #defualt local host
-    HOSTFILE = r"C:\Windows\System32\Drivers\etc\hosts" #default file path for windows host file
 
     def __init__( self ):
         # initialize instance variables
@@ -29,31 +32,6 @@ class BlockedList( object ):
         # the app/website is blocked or not
         self.appDict = {}
         self.webDict = {}
-        
-        
-    # algorithm: uses inreg to create the necessary registers for blocking apps on
-    # windows systems
-    # precondition: called when the necessary registers to not yet exist
-    # postcondition: the necessary registers are created
-    # exceptions: 
-    def initializeRegistry():
-        # initialize function/variables
-        explorerKey = None
-
-        try:
-            # create the necessary registers
-            winreg.CreateKey( HKEY, DISALLOWRUN_DIR )
-            # create the DisallowRun variable
-            explorerKey = winreg.OpenKey( HKEY , EXPLORER_DIR, 0, winreg.KEY_WRITE )
-            winreg.SetValueEx( explorerKey, "DisallowRun", 0, winreg.REG_SZ, "1" )
-            winreg.CloseKey( explorerKey )
-            
-                             
-        except WindowsError as error:
-            if( explorerKey != None ):
-                winreg.CloseKey( explorerKey )
-            print("Unable to run as an administrator - Could not create registries")
-            print(error)
 
     # algorithm: iterates through the app dictionary and adds any blocked apps to
     # the DisallowRun registry, then clears all other values in the registry
@@ -62,7 +40,7 @@ class BlockedList( object ):
     # postcondition: any blocked apps are represented in the DisallowRun registry
     # and there are no artifacts in that registry of previous changes
     # exceptions: 
-    def updateRegistry( appDict ):
+    def updateRegistry( self ):
         # initialize funciton/variables
         disallowKey = None
         index = 1
@@ -72,10 +50,10 @@ class BlockedList( object ):
             disallowKey = winreg.OpenKey( HKEY, DISALLOWRUN_DIR, 0, winreg.KEY_WRITE )
 
             # loop through appDict
-            for app in appDict:
+            for app in self.appDict:
 
                 # if app is blocked, add it
-                if( appDict[ app ] == BLOCKED ):
+                if( self.appDict[ app ] == BLOCKED ):
 
                     winreg.SetValueEx( disallowKey, str( index ), 0, winreg.REG_SZ, app )
                     index += 1
@@ -99,7 +77,7 @@ class BlockedList( object ):
                 winreg.CloseKey( disallowKey )
                 
                 # restart explorer so the changes take effect
-                restartExplorer()
+                self.restartExplorer()
 
                 pass
 
@@ -116,7 +94,7 @@ class BlockedList( object ):
     # to "1" or "" respectively
     # postcondition: the DisallowRun value is changed to the indicated string
     # exceptions:
-    def disallowApps( disallow ):
+    def disallowApps( self, disallow ):
 
         # initialize function/variables
         explorerKey = None
@@ -134,7 +112,7 @@ class BlockedList( object ):
             winreg.CloseKey( explorerKey )
 
             # restart explorer so the changes take effect
-            restartExplorer()
+            self.restartExplorer()
         
         except WindowsError as error:
             if( explorerKey != None ):
@@ -147,7 +125,7 @@ class BlockedList( object ):
     # precondition: 
     # postcondition:
     # exceptions:
-    def restartExplorer():
+    def restartExplorer( self ):
         # initialize function/variables
         cmd = ""
 
@@ -159,26 +137,21 @@ class BlockedList( object ):
         cmd = "exit"
         os.system( cmd )
 
-    # Takes in a blocked website dictionary and blocks them
-    # by adding the website hostnames into system 32 host file
-    def blockWebsite( blockedDict ):
+    def blockWebsite( self ):
         blocked = True
         with open( HOSTFILE, 'r+') as hostFileOpen:
             hostFileContent = hostFileOpen.read()
 
-            for key in blockedDict:
+            for key in self.webDict:
                 if key in hostFileContent:
                     pass
                 
                 else:
                     hostFileOpen.write( LOCALHOST + " " + key + "\n" )
                     
-                    blockedDict[key] = blocked
+                    self.webDict[key] = blocked
 
-    # Takes the same website dictionary that was blocked
-    # and unblockes them by deleting there names from system
-    # 32 host file
-    def unblockWebsite( blockedDict):
+    def unblockWebsite( self ):
         blocked = False
         with open( HOSTFILE, 'r+') as hostFileOpen:
            
@@ -187,10 +160,11 @@ class BlockedList( object ):
             hostFileOpen.seek(0)
 
             for line in hostFileContent:
-                for key in blockedDict:
+                for key in self.webDict:
                     if not key in line:
                         hostFileOpen.write(line)
                     else:
-                        blockedDict[key] = False
+                        self.webDict[key] = False
                         
             hostFileOpen.truncate()
+
