@@ -81,8 +81,8 @@ class BlockedList( object ):
                 pass
 
             else:
-                if( explorerKey != None ):
-                    winreg.CloseKey( explorerKey )
+                if( disallowKey != None ):
+                    winreg.CloseKey( disallowKey )
                 print("Unable to run as an administrator - Could not create registries")
                 print(error)
 
