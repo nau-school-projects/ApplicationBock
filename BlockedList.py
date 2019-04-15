@@ -1,7 +1,6 @@
 # import necessary modules
 import os
 import winreg
-from WebsiteBlocker import *
 
 # initialize constants
 UNBLOCKED = False
