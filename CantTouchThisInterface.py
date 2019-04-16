@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from BlockedList import *
 #from timer import *
-from Scanner import *
+#from Scanner import *
 from timer import *
 
 import time
@@ -82,8 +82,8 @@ class timerThread( threading.Thread ):
 
     # time is up, unblock everything
     timerLabel[ "text" ] = ""
-    disallowApps( False )
-    unblockWebsite( blockList.webDict )
+    blockList.disallowApps( False )
+    blockList.unblockWebsite()
 
 # FUNCTIONS
 def search():
@@ -111,11 +111,12 @@ def addWebsite():
 
 def activateTimedBlock():
     # applications
-    disallowApps( True )
-    updateRegistry( blockList.appDict )
+    blockList.disallowApps( True )
+    #updateRegistry( blockList.appDict )
+    blockList.updateRegistry()
 
     # websites
-    blockWebsite( blockList.webDict )
+    blockList.blockWebsite()
 
     # spool off thread to unblock after time is up
     newThread = timerThread( numHours.get(), numMinutes.get(), timerLabel )
