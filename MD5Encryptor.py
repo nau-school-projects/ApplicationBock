@@ -21,7 +21,7 @@ class MD5Encryptor():
         
 
     def setConstants(self):
-        for(i in range(64)):
+        for i in range(64):
             self.constants[i] = math.floor(2**32 * (int(abs(math.sin(i+1)))))
 
 
@@ -42,17 +42,17 @@ class MD5Encryptor():
         C = self.c0
         D = self.d0
         rotator, index = 0
-        for( i in range(64)):
+        for i in range(64):
             if( 0 <= i < 16 ):
                 rotator = self.func_A(B, C, D)
                 index = i
-            else if( 16 <= i < 32 ):
+            elif( 16 <= i < 32 ):
                 rotator = self.func_B(B, C, D)
                 index = (5*i + 1) % 16
-            else if( 32 <= i < 48 ):
+            elif( 32 <= i < 48 ):
                 rotator = self.func_C(B, C, D)
                 index = (3*i + 5) % 16
-            else if( 48 <= i < 64 ):
+            elif( 48 <= i < 64 ):
                 rotator = self.func_D(B, C, D)
                 index = (7*i) % 16
             # Now rotate A, B, C, D, the rotator, and the index
@@ -67,7 +67,7 @@ class MD5Encryptor():
         d0 += D
         digest = [a0, b0, c0, d0]
         md5Hash = 0
-        for( i in range(4) ):
+        for i in range(4):
             md5Hash += (digest[i] << (32 * i))
         return md5Hash
 

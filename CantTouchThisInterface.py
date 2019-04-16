@@ -17,7 +17,7 @@ blockList = BlockedList()
 
 # initialize window
 root=Tk()
-root.title("Application Lock")
+root.title("Can't Touch This")
 mainframe = ttk.Frame(root, padding="10 10 12 12")
 mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 mainframe.columnconfigure(0, weight=1)
