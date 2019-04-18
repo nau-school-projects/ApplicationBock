@@ -13,17 +13,18 @@ class Scanner:       # creates Scanner class
     # if the website exists
     def addWebsite( hostName, websiteDict ):
         
-    url = "https://" + hostName           # creates the url from the hostname 
+        url = "https://" + hostName           # creates the url from the hostname 
     
-    try:
-        connection = urlopen( url )       # opens a connection with the websites and grabs the response
+        try:
+            connection = urlopen( url )       # opens a connection with the websites and grabs the response
         
-    except (HTTPError, URLError, ValueError) as error:
-        print("Not a Valid Website")      # checks for HTTP, URL, and Value errors
+        except (HTTPError, URLError, ValueError) as error:
+            print("Not a Valid Website")      # checks for HTTP, URL, and Value errors
+            return 0
         
-    else:                                 # if there are no errors 
-        websiteDict[hostName] = BLOCKED   # adds the blocked dictionary
-
+        else:                                 # if there are no errors 
+            websiteDict[hostName] = BLOCKED   # adds the blocked dictionary
+            return 1
 
     # takes an application file path and then adds it
     # to the application dictionary if the its and
@@ -31,7 +32,9 @@ class Scanner:       # creates Scanner class
     def addApplication( filePath, applicationDict ):
         if filePath[-3:] == EXECUTABLE:                    # if the file name is an executible
             applicationDict[filePath] = BLOCKED            # add the file name to the blocked list
+            return 1
         else:
-             print("File not an executable")               # otherwise its not an executible
+            print("File not an executable")               # otherwise its not an executible
+            return 0
 
 
