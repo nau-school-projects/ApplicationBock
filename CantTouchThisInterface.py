@@ -51,23 +51,42 @@ fullList = None
 
 class timerThread( threading.Thread ):
   def __init__( self, firstVal, secondVal, timerLabel, blockType ):
+    
     threading.Thread.__init__(self)
-    if(blockType == BLOCK_NOW):
+    
+    self.timerLabel = timerLabel
+    self.blockType = blockType
+    
+    if( blockType == BLOCK_NOW ):
       self.hours = firstVal
       self.minutes = secondVal
-    if(blockType == BLOCK_SCHEDULED):
+
+    if( blockType == BLOCK_SCHEDULED ):
       self.startTime = firstVal
       self.stopTime = secondVal
       self.hours = 0
       self.minutes = 0
-    self.timerLabel = timerLabel
 
-  def run(self):
+  # function called when thread is started
+  # will split to appropriate behavior based on flag passed
+  def run( self ):
+    if( self.blockType == BLOCK_NOW ):
+      self.runTimer()
+    else:
+      self.scheduleTimer()
+
+  def runTimer( self ):
+    print("got to run")
     # initalizing variables
     hours = self.hours
     minutes = self.minutes;
     seconds = 0
     timerLabel = self.timerLabel
+
+    # block everything
+    blockList.disallowApps( True )
+    blockList.updateRegistry()
+    blockList.blockWebsite()
 
     # calculate total duration in seconds
     duration = int(( hours * 3600 ) + ( minutes * 60 ))
@@ -131,20 +150,20 @@ class timerThread( threading.Thread ):
 
     # formatting time to "xx:xx"
     # if start hour is less than 2 digits, add a leading 0
-    if(startTime[0] < 10):
+    if(int(startTime[0]) < 10):
       startHour = "0" + str(startTime[0])
       # if start min is less than 2 digits, add a leading 0
-      if(startTime[1] < 10):
+      if(int(startTime[1]) < 10):
         startMin = "0" + str(startTime[1])
         start = str(startHour) + ":" + str(startMin)
       else:
         start = str(startHour) + ":" + str(startTime[1])
 
     # if stop hour is less than 2 digits, add a leading 0
-    if(stopTime[0] < 10):
+    if(int(stopTime[0]) < 10):
       stopHour = "0" + str(stopTime[0])
       # if stop min is less than 2 digits, add a leading 0
-      if(stopTime[1] < 10):
+      if(int(stopTime[1]) < 10):
         stopMin = "0" + str(stopTime[1])
         stop = str(stopHour) + ":" + str(stopMin)
       else:
@@ -152,22 +171,24 @@ class timerThread( threading.Thread ):
 
     # if start minute is less than 2 digits but the start hour is not,
     # add a trailing 0 to only the start minute
-    if(startTime[0] > 10 and startTime[1] < 10):
+    if(int(startTime[0]) > 10 and int(startTime[1]) < 10):
       startMin = "0" + str(startTime[1])
       start = str(startTime[0]) + ":" + str(startMin)
     
     # if stop minute is less than 2 digits but the stop hour is not,
     # add a trailing 0 to only the stop minute
-    if(stopTime[0] > 10 and stopTime[1] < 10):
+    if(int(stopTime[0]) > 10 and int(stopTime[1]) < 10):
       stopMin = "0" + str(stopTime[1])
       stop = str(stopTime[0]) + ":" + str(stopMin)
 
     # schedule start and end of timer
-    schedule.every().day.at(start).do(run, self)
+    schedule.every().day.at(start).do(print, "should start timer here")
+    schedule.every().day.at(start).do(self.runTimer, self)
     #schedule.every().day.at(stop).do(exit)
     
     # wait for the scheduled time to run the job
     while True:
+      print(" in the loop\n ")
       schedule.run_pending()
       time.sleep(1)
 
@@ -196,33 +217,16 @@ def addWebsite():
   fullList[ "text" ] = currentList
 
 def activateTimedBlock():
-    # applications
-    blockList.disallowApps( True )
-    #updateRegistry( blockList.appDict )
-    blockList.updateRegistry()
-
-    # websites
-    blockList.blockWebsite()
-
-    # spool off thread to unblock after time is up
+    # spool off thread to block, then unblock after time is up
     newThread = timerThread( numHours.get(), numMinutes.get(), timerLabel, BLOCK_NOW )
     newThread.start()
 
 def activateScheduledTimedBlock():
-
     # creates tuples for scheduleTimer
     startTuple = createStartTuple(startTimeStr.get())
     stopTuple = createStopTuple(stopTimeStr.get())
 
-    # applications
-    blockList.disallowApps( True )
-    #updateRegistry( blockList.appDict )
-    blockList.updateRegistry()
-
-    # websites
-    blockList.blockWebsite()
-
-    # spool off thread to unblock after time is up
+    # spool off thread to block, then unblock after time is up
     newThread = timerThread( startTuple, stopTuple, timerLabel, BLOCK_SCHEDULED )
     newThread.start()
 
