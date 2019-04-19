@@ -83,9 +83,6 @@ class timerThread( threading.Thread ):
   # Function: runTimer
   # Desc: Utilizes time.sleep to run a timer
   def runTimer( self ):
-
-    ### TESTING PRINT LINE (REMEMBER TO MOVE) ###
-    print("\n<< runTimer Started >>\n")
     
     # initalizing variables
     hours = self.hours
@@ -155,9 +152,9 @@ class timerThread( threading.Thread ):
     if(minutesDur != "0"):
       minutesDur = minutesDur.lstrip("0")
     # converting string to int
-    hoursDur = int(hoursDur)
-    minutesDur = int(minutesDur)
-
+    self.hours = int(hoursDur)
+    self.minutes = int(minutesDur)
+    
     # formatting time to "xx:xx"
     # if start hour is less than 2 digits, add a leading 0
     if(int(startTime[0]) < 10):
@@ -214,14 +211,9 @@ class timerThread( threading.Thread ):
     # schedule start and end of timer
     schedule.every().day.at(start).do(self.runTimer)
     # schedule.every().day.at(stop).do(exit)
-    
-    ### TESTING PRINT LINE (REMEMBER TO REMOVE) ###
-    print("\nCurrently in loop, waiting for:", start)
 
     # wait for the scheduled time to run the job
     while True:
-      ### TESTING PRINT LINE (REMEMBER TO REMOVE) ###
-      print("...")
       schedule.run_pending()
       time.sleep(1)
 
