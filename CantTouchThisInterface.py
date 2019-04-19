@@ -27,7 +27,7 @@ mainframe.columnconfigure(0, weight=1)
 mainframe.rowconfigure(0, weight=1)
 mainframe.pack(fill=None, expand=False)
 
-# initialize constants
+# initialize constants for type of block
 BLOCK_SCHEDULED = True
 BLOCK_NOW = False
 
@@ -49,7 +49,10 @@ fullList = None
 
 # THREAD
 
+# timerThread class
 class timerThread( threading.Thread ):
+  
+  # initalize the timer thread
   def __init__( self, firstVal, secondVal, timerLabel, blockType ):
     
     threading.Thread.__init__(self)
@@ -57,10 +60,12 @@ class timerThread( threading.Thread ):
     self.timerLabel = timerLabel
     self.blockType = blockType
     
+    # block will engage immediately
     if( blockType == BLOCK_NOW ):
       self.hours = firstVal
       self.minutes = secondVal
 
+    # block was scheduled
     if( blockType == BLOCK_SCHEDULED ):
       self.startTime = firstVal
       self.stopTime = secondVal
@@ -75,8 +80,13 @@ class timerThread( threading.Thread ):
     else:
       self.scheduleTimer()
 
+  # Function: runTimer
+  # Desc: Utilizes time.sleep to run a timer
   def runTimer( self ):
-    print("got to run")
+
+    ### TESTING PRINT LINE (REMEMBER TO MOVE) ###
+    print("\n<< runTimer Started >>\n")
+    
     # initalizing variables
     hours = self.hours
     minutes = self.minutes;
@@ -182,18 +192,23 @@ class timerThread( threading.Thread ):
       stop = str(stopTime[0]) + ":" + str(stopMin)
 
     # schedule start and end of timer
-    schedule.every().day.at(start).do(print, "should start timer here")
-    schedule.every().day.at(start).do(self.runTimer, self)
-    #schedule.every().day.at(stop).do(exit)
+    schedule.every().day.at(start).do(self.runTimer)
+    # schedule.every().day.at(stop).do(exit)
     
+    ### TESTING PRINT LINE (REMEMBER TO REMOVE) ###
+    print("\nCurrently in loop, waiting for:", start)
+
     # wait for the scheduled time to run the job
     while True:
-      print(" in the loop\n ")
+      ### TESTING PRINT LINE (REMEMBER TO REMOVE) ###
+      print("...")
       schedule.run_pending()
       time.sleep(1)
 
 # FUNCTIONS
+
 def search():
+
   print("The requested app to block is " + appToBlock.get())
   print("The requested time to block  is " + timeDuration.get() + " minutes")
   print("Optional: create a Pin # for lock recent " + pinNumber.get() + " minutes")
@@ -203,6 +218,7 @@ def search():
   return ''
 
 def addApp():
+
   blockList.appDict[ appToBlock.get() ] = BLOCKED
   
   currentList = fullList[ "text" ]
@@ -210,6 +226,7 @@ def addApp():
   fullList[ "text" ] = currentList
 
 def addWebsite():
+
   blockList.webDict[ websiteToBlock.get() ] = BLOCKED
 
   currentList = fullList[ "text" ]
@@ -217,40 +234,42 @@ def addWebsite():
   fullList[ "text" ] = currentList
 
 def activateTimedBlock():
-    # spool off thread to block, then unblock after time is up
-    newThread = timerThread( numHours.get(), numMinutes.get(), timerLabel, BLOCK_NOW )
-    newThread.start()
+
+  # spool off thread to block, then unblock after time is up
+  newThread = timerThread( numHours.get(), numMinutes.get(), timerLabel, BLOCK_NOW )
+  newThread.start()
 
 def activateScheduledTimedBlock():
-    # creates tuples for scheduleTimer
-    startTuple = createStartTuple(startTimeStr.get())
-    stopTuple = createStopTuple(stopTimeStr.get())
 
-    # spool off thread to block, then unblock after time is up
-    newThread = timerThread( startTuple, stopTuple, timerLabel, BLOCK_SCHEDULED )
-    newThread.start()
+  # creates tuples for scheduleTimer (formatting)
+  startTuple = createStartTuple(startTimeStr.get())
+  stopTuple = createStopTuple(stopTimeStr.get())
+
+  # spool off thread to block, then unblock after time is up
+  newThread = timerThread( startTuple, stopTuple, timerLabel, BLOCK_SCHEDULED )
+  newThread.start()
 
 def createStartTuple(startTimeStr):
 
-    # convert string to tuple
-    startTimeStr = str(startTimeStr)
-    startTimeList = startTimeStr.split(":")
-    startTimeTuple = (startTimeList[0], startTimeList[1])
+  # convert string to tuple
+  startTimeStr = str(startTimeStr)
+  startTimeList = startTimeStr.split(":")
+  startTimeTuple = (startTimeList[0], startTimeList[1])
 
-    # return tuple
-    return startTimeTuple
+  # return tuple
+  return startTimeTuple
 
 def createStopTuple(stopTimeStr):
 
-    # convert string to tuple
-    stopTimeStr = str(stopTimeStr)
-    stopTimeList = stopTimeStr.split(":")
-    stopTimeTuple = (stopTimeList[0], stopTimeList[1])
+  # convert string to tuple
+  stopTimeStr = str(stopTimeStr)
+  stopTimeList = stopTimeStr.split(":")
+  stopTimeTuple = (stopTimeList[0], stopTimeList[1])
 
-    # return tuple
-    return stopTimeTuple
-  
-# WINDOW
+  # return tuple
+  return stopTimeTuple
+
+# UI WINDOW
 
 # TIMER
 timerLabel = ttk.Label(mainframe, text="")
@@ -280,25 +299,29 @@ fullList.grid(column=4, row=1, rowspan = 10, sticky = N+S)
 ## TIME TO BE BLOCKED FOR
 ttk.Label(mainframe, text="How Long Would You Like To Block The Application").grid(column=2, row=5)
 
+# ENTER AMOUNT OF HOURS FOR LOCK
 ttk.Label(mainframe, text="Enter Hours").grid(column=2, row=6)
 ttk.Entry(mainframe, width=5, textvariable=numHours).grid(column=2, row=7)
 
+# ENTER AMOUNT OF MINUTES FOR LOCK
 ttk.Label(mainframe, text="Enter Minutes").grid(column=2, row=8)
 ttk.Entry(mainframe, width=5, textvariable=numMinutes).grid(column=2, row=9)
 
-#BUTTON
+# BUTTON TO ENGAGE IMMEDIATE LOCK
 ttk.Button(mainframe, text="Engage Lock", command=activateTimedBlock).grid(column=2, row=10)
 
 ## SCHEDULE TIME TO BE BLOCKED
 ttk.Label(mainframe, text="Schedule Time to Block").grid(column=2, row=11)
 
+# ENTER START TIME
 ttk.Label(mainframe, text="Enter Start Time (24hr, format 'xx:xx')").grid(column=2, row=12)
 ttk.Entry(mainframe, width=5, textvariable=startTimeStr).grid(column=2, row=13)
 
+# ENTER STOP TIME
 ttk.Label(mainframe, text="Enter Stop Time (24hr, format 'xx:xx')").grid(column=2, row=14)
 ttk.Entry(mainframe, width=5, textvariable=stopTimeStr).grid(column=2, row=15)
 
-#BUTTON
+# BUTTON TO ENGAGE A SCHEDULED LOCK
 ttk.Button(mainframe, text="Engage Scheduled Lock", command=activateScheduledTimedBlock).grid(column=2, row=16)
 
 # APP PIN TO GET DISIRED APPS TO BLOCK
