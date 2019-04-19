@@ -126,6 +126,9 @@ class timerThread( threading.Thread ):
     blockList.disallowApps( False )
     blockList.unblockWebsite()
 
+    # return success
+    return 1
+
   # Function: scheduleTimer
   # Desc: schedules the runTimer method to run during
   #       passed in intervals
@@ -136,6 +139,7 @@ class timerThread( threading.Thread ):
     stopTime = self.stopTime
     hoursDur = self.hours
     minutesDur = self.minutes
+    timerLabel[ "text" ] = "waiting"
 
     # initialize variables and format them to ("xx:xx")
     start = str(startTime[0]) + ":" + str(startTime[1])
