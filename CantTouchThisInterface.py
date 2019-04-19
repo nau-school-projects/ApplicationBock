@@ -161,20 +161,32 @@ class timerThread( threading.Thread ):
     # formatting time to "xx:xx"
     # if start hour is less than 2 digits, add a leading 0
     if(int(startTime[0]) < 10):
-      startHour = "0" + str(startTime[0])
+      tempStartHr = str(startTime[0])
+      tempStartHr = tempStartHr.lstrip("0")
+      startHour = "0" + str(tempStartHr)
       # if start min is less than 2 digits, add a leading 0
       if(int(startTime[1]) < 10):
-        startMin = "0" + str(startTime[1])
+        tempStartMin = str(startTime[1])
+        tempStartMin = tempStartMin.lstrip("0")
+        startMin = "0" + str(tempStartMin)
+        if(startMin == "0"):
+          startMin = "0" + startMin
         start = str(startHour) + ":" + str(startMin)
       else:
         start = str(startHour) + ":" + str(startTime[1])
 
     # if stop hour is less than 2 digits, add a leading 0
     if(int(stopTime[0]) < 10):
-      stopHour = "0" + str(stopTime[0])
+      tempStopHr = str(stopTime[0])
+      tempStopHr = tempStopHr.lstrip("0")
+      stopHour = "0" + str(tempStopHr)
       # if stop min is less than 2 digits, add a leading 0
       if(int(stopTime[1]) < 10):
-        stopMin = "0" + str(stopTime[1])
+        tempStopMin = str(stopTime[1])
+        tempStopMin = tempStopMin.lstrip("0")
+        stopMin = "0" + str(tempStopMin)
+        if(stopMin == "0"):
+          stopMin = "0" + stopMin
         stop = str(stopHour) + ":" + str(stopMin)
       else:
         stop = str(stopHour) + ":" + str(stopTime[1])
@@ -182,13 +194,21 @@ class timerThread( threading.Thread ):
     # if start minute is less than 2 digits but the start hour is not,
     # add a trailing 0 to only the start minute
     if(int(startTime[0]) > 10 and int(startTime[1]) < 10):
-      startMin = "0" + str(startTime[1])
+      tempStartMin = str(startTime[1])
+      tempStartMin = tempStartMin.lstrip("0")
+      startMin = "0" + str(tempStartMin)
+      if(startMin == "0"):
+        startMin = "0" + startMin
       start = str(startTime[0]) + ":" + str(startMin)
     
     # if stop minute is less than 2 digits but the stop hour is not,
     # add a trailing 0 to only the stop minute
     if(int(stopTime[0]) > 10 and int(stopTime[1]) < 10):
-      stopMin = "0" + str(stopTime[1])
+      tempStopMin = str(stopTime[1])
+      tempStopMin = tempStopMin.lstrip("0")
+      stopMin = "0" + str(tempStopMin)
+      if(stopMin == "0"):
+        stopMin = "0" + stopMin
       stop = str(stopTime[0]) + ":" + str(stopMin)
 
     # schedule start and end of timer
