@@ -31,9 +31,9 @@ class SimpleTestCase( unittest.TestCase ):
 
         assert testManager.usersDict[0].password == "passwordA"
 
-        assert testManager.usersDict[1].name == "usernameB"
+        assert testManager.usersDict[1].name = "usernameB"
 
-        assert testManager.usersDict[1].password == "passwordB"
+        assert testManager.usersDict[1].password = "passwordB"
         
 # run all tests
 if __name__ == "__main__":
