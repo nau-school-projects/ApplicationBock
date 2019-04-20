@@ -76,24 +76,21 @@ class UserManager( object ):
     # TODO: Implement writing to and reading from a file.
     # save data
     def saveData(self):
-        
         userFile = open("UserProfile.txt", "w")
         
-        for userKey in self.usersDict:
-
-            user = self.usersDict[ userKey ]
+        for user in self.usersDict:
             
             #line0
             userFile.write("User name: " + user.name + "\n")
 
             #line1
-            password = user.aesMan.encrypt(user.password)
-            userFile.write("Pass: " + str(password) + "\n")
+            password = aesMan.encrypt(self.password)
+            userFile.write("Pass: " + password + "\n")
 
             #line2
-            userFile.write( str(user.aesMan.key) + "\n")
+            userFile.write("b'" + user.aesMan.key + "'\n")
             #line3
-            userFile.write( str(user.aesMan.nonce) + "\n")
+            userFile.write("b'" + user.aesMan.nonce + "'\n")
             
             appsToBlock = user.blockedList.appDict.keys()
             webToBlock = user.blockedList.webDict.keys()
