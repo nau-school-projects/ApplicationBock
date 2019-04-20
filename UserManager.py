@@ -76,36 +76,47 @@ class UserManager( object ):
     # TODO: Implement writing to and reading from a file.
     # save data
     def saveData(self):
-        userFile = open("UserProfile.txt", "w")
         
-        for user in self.usersDict:
+        newline = "\n"
+        newline = newline.encode('utf-8')
+
+        userFile = open("UserProfile.bin", "wb")
+        
+        for userKey in self.usersDict:
+
+            user = self.usersDict[ userKey ]
             
             #line0
-            userFile.write("User name: " + user.name + "\n")
+            userFile.write( ( user.name + "\n").encode('utf-8') )
 
             #line1
-            password = aesMan.encrypt(self.password)
-            userFile.write("Pass: " + password + "\n")
+            password = user.aesMan.encrypt(user.password)
+            userFile.write( ( str(password) + "\n").encode('utf-8') )
 
             #line2
-            userFile.write("b'" + user.aesMan.key + "'\n")
+            userFile.write( user.aesMan.key )
+            userFile.write( newline )
+            
             #line3
-            userFile.write("b'" + user.aesMan.nonce + "'\n")
+            userFile.write( user.aesMan.nonce )
+            userFile.write( newline )
             
             appsToBlock = user.blockedList.appDict.keys()
             webToBlock = user.blockedList.webDict.keys()
 
             #line4
-            userFile.write("Apps:\n")
+            #userFile.write( ("Apps:\n").encode('utf-8') )
             #line5
-            userFile.write(str(appsToBlock))
+            userFile.write( str(appsToBlock).encode('utf-8') )
+            userFile.write( newline )
 
             #line6
-            userFile.write("Web:\n")
+            #userFile.write( ("Web:\n").encode('utf-8') )
             #line7
-            userFile.write(str(webToBlock))
+            userFile.write( str(webToBlock).encode('utf-8') )
+            userFile.write( newline )
 
-            userFile.write("\nNext User\n")
+            userFile.write( ("\nNext User\n").encode('utf-8') )
 
         userFile.close()
         
@@ -113,30 +124,24 @@ class UserManager( object ):
     # load data
     def loadData(self):
         
-        userFile = open("UserProfile.txt", "r")
+        userFile = open("UserProfile.bin", "rb")
 
         file = userFile.read()
-        Users = file.split("Next User")
+        Users = file.split( ("Next User\n").encode('utf-8') )
 
         for user in Users:
 
-            fileText = user.split("\n")
-            line1 = fileText[0].split()
-            name = line1[2]
-            i = 3
-            while(i < len(line1)):
-                name = name + " " + line1[i]
-                i += 1
+            fileText = user.split( ("\n").encode('utf-8') )
             
-            line2 = fileText[1].split()
-            password = line2[1]
+            name = fileText[0].decode('utf-8')
+            password = fileText[1].decode('utf-8')
             key = fileText[2]
             nonce = fileText[3]
             aes = AesManager(key, nonce)
             password = aes.decrypt(password)
     
-            appsDict = ast.literal_eval(fileText[5])
-            webDict = ast.literal_eval(fileText[7])
+            appsDict = ast.literal_eval(fileText[4].decode('utf-8'))
+            webDict = ast.literal_eval(fileText[5].decode('utf-8'))
     
             blockList = BlockedList()
             blockList.appDict = appsDict

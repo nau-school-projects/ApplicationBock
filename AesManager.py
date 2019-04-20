@@ -5,13 +5,24 @@ from random import randint
 class AesManager():
 
     def __init__( self, key=None, nonce=None ):
+        
         if( key == None ):
-           key = Random.get_random_bytes(16)
-        self.key = key
-        self.aes = AES.new(key, AES.MODE_EAX )
+            print( "generated new key" )
+            self.key = Random.get_random_bytes(16)
+        else:
+            self.key = key
+            
+        self.aes = AES.new(self.key, AES.MODE_EAX )
+        
         if( nonce == None ):
+            print( "generated new nonce" )
             self.nonce = self.aes.nonce
-        self.nonce = self.aes.nonce
+        else:
+            self.nonce = nonce
+
+        if( self.nonce == None or self.key == None ):
+            print( "done goofed" )
+        
 
     def encrypt(self, password):
         password = password.encode('utf-8')
@@ -20,7 +31,7 @@ class AesManager():
 
     def decrypt(self, encrypted):
         self.aes = AES.new(self.key, AES.MODE_EAX, nonce=self.nonce)
-        decrypted = self.aes.decrypt(encrypted)
+        decrypted = self.aes.decrypt( encrypted.encode('utf-8') )
         return decrypted
         
     
