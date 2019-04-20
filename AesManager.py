@@ -11,7 +11,7 @@ class AesManager():
         self.aes = AES.new(key, AES.MODE_EAX )
         if( nonce == None ):
             self.nonce = self.aes.nonce
-        self.nonce = nonce
+        self.nonce = self.aes.nonce
 
     def encrypt(self, password):
         password = password.encode('utf-8')
