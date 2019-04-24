@@ -149,6 +149,7 @@ class BlockedList( object ):
                     hostFileOpen.write( LOCALHOST + " " + key + "\n" )
                     
                     self.webDict[key] = blocked
+        return 0
 
     def unblockWebsite( self ):
         blocked = False
@@ -166,4 +167,6 @@ class BlockedList( object ):
                         self.webDict[key] = False
                         
             hostFileOpen.truncate()
+            
+        return 0
 
