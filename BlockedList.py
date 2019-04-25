@@ -87,10 +87,10 @@ class BlockedList( object ):
                 print(error)
 
     # algorithm: sets the DisallowRun value in the Explorer key to:
-    # "1" - disables applications in the DisallowRun key
-    # "" - enables applciations in the DisallowRun key
+    # "true" - disables applications in the DisallowRun key
+    # "false" - enables applciations in the DisallowRun key
     # precondition: passed True or False indicating whether the value should be set
-    # to "1" or "" respectively
+    # to "true" or "false" respectively
     # postcondition: the DisallowRun value is changed to the indicated string
     # exceptions:
     def disallowApps( self, disallow ):
@@ -136,6 +136,58 @@ class BlockedList( object ):
         cmd = "exit"
         os.system( cmd )
 
+    # algorithm: utility testing function that iterates through the disallowrun
+    # registry and returns true if it finds the indicated key
+    # precondition: passed key value as a string
+    # postcondition: returns true if the key value is present, false otherwise
+    # exceptions:
+    def keyIsPresent( self, key ):
+        disallowKey = None
+        index = 1
+
+        try:
+            # open the disallowrun registry
+            disallowKey = winreg.OpenKey( HKEY, DISALLOWRUN_DIR, 0, winreg.KEY_READ )
+
+            while True:
+                
+                if winreg.QueryValueEx( disallowKey, str( index ) )[0] == key:
+                    winreg.CloseKey( disallowKey )
+                    return True
+                
+                index += 1
+
+        except WindowsError as error:
+            if( disallowKey != None ):
+                winreg.CloseKey( disallowKey )
+            print("Could not find key")
+            print(error)
+            return False
+        
+    # algorithm: utility testing function that checks if the DisallowRun key in
+    # the explorer register has been set to "1" or ""
+    # precondition: disallowApps has been run at least once
+    # postcondition: returns true if the value is "1", false otherwise
+    # exceptions:
+    def appsAreBlocked( self ):
+        explorerKey = None
+
+        try:
+            # write application name to the registry
+            explorerKey = winreg.OpenKey( HKEY, EXPLORER_DIR, 0, winreg.KEY_READ )
+            if winreg.QueryValueEx( explorerKey, "DisallowRun" )[0] == "1":
+                winreg.CloseKey( explorerKey )
+                return True
+            else:
+                winreg.CloseKey( explorerKey )
+                return False
+
+        except WindowsError as error:
+            if( explorerKey != None ):
+                winreg.CloseKey( explorerKey )
+            print("Unable to run as an administrator - Could not create registries")
+            print(error)
+
     def blockWebsite( self ):
         blocked = True
         with open( HOSTFILE, 'r+') as hostFileOpen:
@@ -149,7 +201,6 @@ class BlockedList( object ):
                     hostFileOpen.write( LOCALHOST + " " + key + "\n" )
                     
                     self.webDict[key] = blocked
-        return 0
 
     def unblockWebsite( self ):
         blocked = False
@@ -167,6 +218,6 @@ class BlockedList( object ):
                         self.webDict[key] = False
                         
             hostFileOpen.truncate()
-            
-        return 0
+
+        
 
